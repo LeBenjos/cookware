@@ -8,7 +8,64 @@ Collection of TypeScript tools and utilities for my personal projects.
 npm install @benjos/cookware
 ```
 
-**Requirements:** TypeScript ≥ 5.0.0
+**Requirements:**
+- TypeScript ≥ 5.0.0
+- @benjos/spices ^ 1.0.1
+
+
+## Managers (Singletons)
+
+### DomKeyboardManager
+
+Handles global keyboard events and exposes actions for key management.
+
+```typescript
+import { DomKeyboardManager } from '@benjos/cookware';
+
+DomKeyboardManager.init();
+DomKeyboardManager.onKeyDown.add((e) => console.log('Key down:', e.key));
+DomKeyboardManager.onKeyUp.add((e) => console.log('Key up:', e.key));
+```
+
+### DomPointerManager
+
+Unified mouse and touch event management, exposes pointer position and actions for interactions.
+
+```typescript
+import { DomPointerManager } from '@benjos/cookware';
+
+DomPointerManager.init();
+DomPointerManager.onMouseMove.add((e) => {
+  // Use DomPointerManager.x, y, normalizedX, normalizedY, etc.
+});
+```
+
+### DomResizeManager
+
+Detects window resize events and exposes actions and useful getters.
+
+```typescript
+import { DomResizeManager } from '@benjos/cookware';
+
+DomResizeManager.init();
+DomResizeManager.onResize.add(() => {
+  console.log('New size:', DomResizeManager.width, DomResizeManager.height);
+});
+```
+
+### TickerManager
+
+Animation loop manager based on `requestAnimationFrame`, allows adding callbacks executed every frame.
+
+```typescript
+import { TickerManager } from '@benjos/cookware';
+
+TickerManager.init();
+TickerManager.add((dt) => {
+  // dt = delta time in seconds
+});
+```
+
 
 ## Tools (Classes to instantiate)
 
@@ -55,6 +112,7 @@ const point = pool.get();
 pool.release(point);
 ```
 
+
 ## Utils (Singletons ready to use)
 
 ### AssetUtils
@@ -80,6 +138,7 @@ import { DomUtils } from '@benjos/cookware';
 const app = DomUtils.getApp();       // Gets or creates #app or #root
 const loader = DomUtils.getLoader(); // Gets or creates #loader
 ```
+
 
 ## License
 

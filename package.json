@@ -1,6 +1,6 @@
 {
   "name": "@benjos/cookware",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Collection of TypeScript tools and utilities for personal projects",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -24,6 +24,7 @@
   "author": "benjos",
   "license": "ISC",
   "peerDependencies": {
+    "@benjos/spices": "^1.0.1",
     "typescript": ">=5.0.0"
   },
   "bugs": {
