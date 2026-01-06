@@ -2,17 +2,13 @@ import Action from "../tools/Action";
 import TickerManager from "./TickerManager";
 
 class DomResizeManager {
+    private static readonly _MAX_PIXEL_RATIO: number = 2;
+
     private _width: number = window.innerWidth;
     private _height: number = window.innerHeight;
     private _pixelRatio: number = Math.min(window.devicePixelRatio, DomResizeManager._MAX_PIXEL_RATIO);
 
     public readonly onResize = new Action();
-
-    //#region Constants
-    //
-    private static readonly _MAX_PIXEL_RATIO: number = 2;
-    //
-    //#endregion
 
     public init(): void {
         this.reset();

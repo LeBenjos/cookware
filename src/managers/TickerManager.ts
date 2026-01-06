@@ -8,6 +8,9 @@ export type Tickable = {
 };
 
 class TickerManager {
+    private static readonly _TIME_SCALE: number = 0.001;
+    private static readonly _MAX_DELTA: number = 0.1;
+
     declare private _rafId?: number;
     private _isRunning: boolean = false;
     private readonly _tickables: Map<(dt: number) => void, Tickable> = new Map();
@@ -15,13 +18,6 @@ class TickerManager {
     private _currentTime: number = this._startTime;
     private _elapsedTime: number = 0;
     private _deltaTime: number = 0.016;
-
-    //#region Constants
-    //
-    private static readonly _TIME_SCALE: number = 0.001;
-    private static readonly _MAX_DELTA: number = 0.1;
-    //
-    //#endregion
 
     public init(): void {
         this.start();

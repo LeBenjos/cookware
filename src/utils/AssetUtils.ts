@@ -1,24 +1,14 @@
-class AssetUtils {
-    private _basePath: string;
-
-    //#region Constants
-    //
+export default class AssetUtils {
     private static readonly _DEFAULT_BASE_PATH = "./assets/";
-    //
-    //#endregion
 
-    constructor() {
-        this._basePath = AssetUtils._DEFAULT_BASE_PATH;
+    private static _BasePath: string = AssetUtils._DEFAULT_BASE_PATH;
+
+    public static Init(basePath: string = AssetUtils._DEFAULT_BASE_PATH): void {
+        AssetUtils._BasePath = basePath;
     }
 
-    public init(basePath: string = AssetUtils._DEFAULT_BASE_PATH): void {
-        this._basePath = basePath;
-    }
-
-    public getPath(path: string): string {
+    public static GetPath(path: string): string {
         path = path.trim();
-        return `${this._basePath}${path}`;
+        return `${AssetUtils._BasePath}${path}`;
     }
 }
-
-export default new AssetUtils();

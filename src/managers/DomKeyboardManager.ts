@@ -32,9 +32,9 @@ class DomKeyboardManager {
     };
 
     private readonly _onKeyUp = (e: KeyboardEvent): void => {
-        this.onKeyUp.execute(e);
         this._keyDownsMap.set(e.key, false);
         this._codeDownsMap.set(e.code, false);
+        this.onKeyUp.execute(e);
     };
 
     public isKeyDown(name: string): boolean {

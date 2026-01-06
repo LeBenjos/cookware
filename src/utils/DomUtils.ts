@@ -1,30 +1,29 @@
-class DomUtils {
-    public getApp(): HTMLDivElement {
-        const app = document.querySelector('#app') ?? document.querySelector('#root');
+export default class DomUtils {
+    public static GetApp(selector: string = '#app'): HTMLDivElement {
+        const app = document.querySelector<HTMLDivElement>(selector)
+            ?? document.querySelector<HTMLDivElement>('#root');
 
         if (!app) {
             const newApp = document.createElement('div');
-            newApp.id = 'app';
+            newApp.id = selector.replace('#', '');
             document.body.appendChild(newApp);
             return newApp;
         }
 
-        return app as HTMLDivElement;
+        return app;
     }
 
-    public getLoader(): HTMLDivElement {
-        const loader = document.querySelector('#loader');
+    public static GetLoader(selector: string = '#loader'): HTMLDivElement {
+        const loader = document.querySelector<HTMLDivElement>(selector);
 
         if (!loader) {
-            const app = this.getApp();
+            const app = DomUtils.GetApp();
             const newLoader = document.createElement('div');
-            newLoader.id = 'loader';
+            newLoader.id = selector.replace('#', '');
             app.appendChild(newLoader);
             return newLoader;
         }
 
-        return loader as HTMLDivElement;
+        return loader;
     }
 }
-
-export default new DomUtils();
