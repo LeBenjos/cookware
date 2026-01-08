@@ -6,8 +6,8 @@ class DomPointerManager {
     private _y: number = 0;
     private _normalizedX: number = 0;
     private _normalizedY: number = 0;
-    private _centralX: number = 0;
-    private _centralY: number = 0;
+    private _ndcX: number = 0;
+    private _ndcY: number = 0;
 
     public readonly onPointerDown = new Action();
     public readonly onPointerUp = new Action();
@@ -49,8 +49,8 @@ class DomPointerManager {
         this._y = event.clientY;
         this._normalizedX = this._x / window.innerWidth;
         this._normalizedY = 1 - this._y / window.innerHeight;
-        this._centralX = this._normalizedX * 2 - 1;
-        this._centralY = this._normalizedY * 2 - 1;
+        this._ndcX = this._normalizedX * 2 - 1;
+        this._ndcY = this._normalizedY * 2 - 1;
     }
 
     //#region Getters
@@ -67,11 +67,11 @@ class DomPointerManager {
     public get normalizedY(): number {
         return this._normalizedY;
     }
-    public get centralX(): number {
-        return this._centralX;
+    public get ndcX(): number {
+        return this._ndcX;
     }
-    public get centralY(): number {
-        return this._centralY;
+    public get ndcY(): number {
+        return this._ndcY;
     }
     //
     //#endregion
