@@ -1,6 +1,6 @@
 {
   "name": "@benjos/cookware",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Collection of TypeScript managers, tools and utilities for personal projects",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
