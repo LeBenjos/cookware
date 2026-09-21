@@ -1,67 +1,95 @@
-import { DomEvent } from "@benjos/spices";
-import Action from "../tools/Action";
+import Action from "../tools/Action.js";
 
-class DomKeyboardManager {
-    private readonly _keyDownsMap = new Map<string, boolean>();
-    private readonly _codeDownsMap = new Map<string, boolean>();
+export class DomKeyboardManager {
+    private static readonly _MODIFIER_CODES = new Set([
+        "ShiftLeft", "ShiftRight",
+        "ControlLeft", "ControlRight",
+        "AltLeft", "AltRight",
+        "MetaLeft", "MetaRight",
+        "CapsLock",
+    ]);
+
+    private readonly _downCodes = new Set<string>();
 
     public readonly onKeyDown = new Action<[KeyboardEvent]>();
     public readonly onKeyUp = new Action<[KeyboardEvent]>();
 
     public init(): void {
-        this._keyDownsMap.clear();
-        this._codeDownsMap.clear();
+        this._clearDownState();
         this._addCallbacks();
+    }
+
+    public dispose(): void {
+        this._removeCallbacks();
+        this._clearDownState();
+        this.onKeyDown.removeAll();
+        this.onKeyUp.removeAll();
     }
 
     private _addCallbacks(): void {
         this._removeCallbacks();
-        window.addEventListener(DomEvent.KEY_DOWN, this._onKeyDown);
-        window.addEventListener(DomEvent.KEY_UP, this._onKeyUp);
+        window.addEventListener("keydown", this._onKeyDown);
+        window.addEventListener("keyup", this._onKeyUp);
+        window.addEventListener("blur", this._clearDownState);
+        document.addEventListener("visibilitychange", this._onVisibilityChange);
     }
 
     private _removeCallbacks(): void {
-        window.removeEventListener(DomEvent.KEY_DOWN, this._onKeyDown);
-        window.removeEventListener(DomEvent.KEY_UP, this._onKeyUp);
+        window.removeEventListener("keydown", this._onKeyDown);
+        window.removeEventListener("keyup", this._onKeyUp);
+        window.removeEventListener("blur", this._clearDownState);
+        document.removeEventListener("visibilitychange", this._onVisibilityChange);
     }
 
     private readonly _onKeyDown = (e: KeyboardEvent): void => {
-        this._keyDownsMap.set(e.key, true);
-        this._codeDownsMap.set(e.code, true);
+        this._downCodes.add(e.code);
         this.onKeyDown.execute(e);
     };
 
     private readonly _onKeyUp = (e: KeyboardEvent): void => {
-        this._keyDownsMap.set(e.key, false);
-        this._codeDownsMap.set(e.code, false);
+        this._downCodes.delete(e.code);
+        if (e.key === "Meta") this._clearNonModifiers();
         this.onKeyUp.execute(e);
     };
 
-    public isKeyDown(name: string): boolean {
-        if (!this.isAvailableForControl()) return false;
-        if (this._codeDownsMap.get(name)) return true;
-        if (this._keyDownsMap.get(name)) return true;
-        return false;
+    private readonly _onVisibilityChange = (): void => {
+        if (document.visibilityState === "hidden") this._clearDownState();
+    };
+
+    private readonly _clearDownState = (): void => {
+        this._downCodes.clear();
+    };
+
+    private _clearNonModifiers(): void {
+        for (const code of this._downCodes) {
+            if (!DomKeyboardManager._MODIFIER_CODES.has(code)) {
+                this._downCodes.delete(code);
+            }
+        }
     }
 
-    public isAnyKeyDown(names: string[]): boolean {
-        if (!this.isAvailableForControl()) return false;
-        return names.some((name) => this.isKeyDown(name));
+    public isKeyDown(code: string): boolean {
+        return this.isAvailableForControl() && this._downCodes.has(code);
     }
 
-    public areAllKeysDown(names: string[]): boolean {
-        if (!this.isAvailableForControl()) return false;
-        return names.every((name) => this.isKeyDown(name));
+    public isAnyKeyDown(codes: string[]): boolean {
+        return codes.some((code) => this.isKeyDown(code));
+    }
+
+    public areAllKeysDown(codes: string[]): boolean {
+        return codes.every((code) => this.isKeyDown(code));
     }
 
     public isAvailableForControl(): boolean {
-        const active: HTMLElement = document.activeElement as HTMLElement;
+        let active = document.activeElement;
+        while (active?.shadowRoot?.activeElement) {
+            active = active.shadowRoot.activeElement;
+        }
         return !(
             active instanceof HTMLInputElement ||
             active instanceof HTMLTextAreaElement ||
-            active?.isContentEditable
+            active instanceof HTMLSelectElement ||
+            (active instanceof HTMLElement && active.isContentEditable)
         );
     }
 }
-
-export default new DomKeyboardManager();

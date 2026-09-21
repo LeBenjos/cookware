@@ -6,36 +6,37 @@ export interface Poolable {
 }
 
 export default class Pool<T extends Poolable> {
-    private static readonly _DEFAULT_INITIAL_SIZE: number = 0;
-
     private readonly _ctor: PoolConstructor<T>;
-    protected readonly _pool: T[] = [];
-    private readonly _inPool = new WeakSet();
+    private readonly _pool: T[] = [];
+    private readonly _lent = new WeakSet<T>();
 
-    constructor(ctor: PoolConstructor<T>, initialSize: number = Pool._DEFAULT_INITIAL_SIZE) {
+    constructor(ctor: PoolConstructor<T>, initialSize: number = 0) {
         this._ctor = ctor;
-        this._prepopulate(initialSize);
+        this.ensureSize(initialSize);
     }
 
-    private _prepopulate(count: number): void {
-        for (let i = 0; i < count; i++) {
-            const o = new this._ctor();
-            this._pool.push(o);
-            this._inPool.add(o);
+    public ensureSize(count: number): void {
+        for (let i = this._pool.length; i < count; i++) {
+            this._pool.push(new this._ctor());
         }
     }
 
     public get(): T {
         const o = this._pool.pop() ?? new this._ctor();
-        this._inPool.delete(o);
+        this._lent.add(o);
+        o.init();
         return o;
     }
 
     public release(o: T): void {
-        if (this._inPool.has(o)) {
-            throw new Error("Object is already in pool.");
+        if (!this._lent.delete(o)) {
+            throw new Error("Pool.release: object is not currently borrowed from this pool (already released, or never obtained via get()).");
         }
-        this._inPool.add(o);
+        o.reset();
         this._pool.push(o);
+    }
+
+    public get size(): number {
+        return this._pool.length;
     }
 }

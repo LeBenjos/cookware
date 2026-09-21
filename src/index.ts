@@ -1,15 +1,19 @@
-// Managers
-export { default as DomKeyboardManager } from './managers/DomKeyboardManager';
-export { default as DomPointerManager } from './managers/DomPointerManager';
-export { default as DomResizeManager } from './managers/DomResizeManager';
-export { default as TickerManager } from './managers/TickerManager';
+// Managers (classes — instantiate and own them in your app)
+export { DomKeyboardManager } from './managers/DomKeyboardManager.js';
+export { DomPointerManager } from './managers/DomPointerManager.js';
+export { DomResizeManager } from './managers/DomResizeManager.js';
+export { PoolManager } from './managers/PoolManager.js';
+export { TickerManager } from './managers/TickerManager.js';
+export type { Tickable, TickableOptions } from './managers/TickerManager.js';
 
 // Tools
-export { default as Action } from './tools/Action';
-export { default as Point } from './tools/Point';
-export { default as Pool } from './tools/Pool';
+export { default as Action } from './tools/Action.js';
+export type { Listener } from './tools/Action.js';
+export { default as Point } from './tools/Point.js';
+export { default as Pool } from './tools/Pool.js';
+export type { Poolable, PoolConstructor } from './tools/Pool.js';
 
 // Utils
-export { default as AssetUtils } from './utils/AssetUtils';
-export { default as DomUtils } from './utils/DomUtils';
+export { default as AssetUtils } from './utils/AssetUtils.js';
+export { default as DomUtils } from './utils/DomUtils.js';
 

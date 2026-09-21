@@ -1,39 +1,39 @@
-import Pool, { Poolable, PoolConstructor } from "../tools/Pool";
+import Pool, { Poolable, PoolConstructor } from "../tools/Pool.js";
 
-class PoolManager {
-    declare private _pools: Map<PoolConstructor<Poolable>, Pool<Poolable>>;
+export class PoolManager {
+    private readonly _pools = new Map<PoolConstructor<Poolable>, Pool<Poolable>>();
 
     public init(): void {
-        this._pools = new Map();
+        this.dispose();
     }
 
-    public add<T extends Poolable>(ctor: PoolConstructor<T>, initialSize: number = 0): void {
-        if (!this._pools.has(ctor)) {
-            this._pools.set(ctor, new Pool(ctor, initialSize));
-        }
+    public dispose(): void {
+        this._pools.clear();
+    }
+
+    public prewarm<T extends Poolable>(ctor: PoolConstructor<T>, initialSize: number = 0): void {
+        this._getPool(ctor).ensureSize(initialSize);
     }
 
     public get<T extends Poolable>(ctor: PoolConstructor<T>): T {
-        if (!this._pools.has(ctor)) {
-            this.add(ctor);
-        }
-
-        const pool = this._pools.get(ctor)!;
-        const o = pool.get();
-        o.init();
-        return o as T;
+        return this._getPool(ctor).get() as T;
     }
 
     public release<T extends Poolable>(o: T): void {
         const ctor = o.constructor as PoolConstructor<T>;
-        if (!this._pools.has(ctor)) {
-            this.add(ctor);
+        const pool = this._pools.get(ctor);
+        if (!pool) {
+            throw new Error(`PoolManager.release: no pool for "${ctor.name}" — objects must be obtained via get() and are pooled by their concrete class.`);
         }
-
-        o.reset();
-        const pool = this._pools.get(ctor)!;
         pool.release(o);
     }
-}
 
-export default new PoolManager();
+    private _getPool<T extends Poolable>(ctor: PoolConstructor<T>): Pool<Poolable> {
+        let pool = this._pools.get(ctor);
+        if (!pool) {
+            pool = new Pool(ctor);
+            this._pools.set(ctor, pool);
+        }
+        return pool;
+    }
+}

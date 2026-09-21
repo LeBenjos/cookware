@@ -1,29 +1,26 @@
 export default class DomUtils {
-    public static GetApp(selector: string = '#app'): HTMLDivElement {
-        const app = document.querySelector<HTMLDivElement>(selector)
-            ?? document.querySelector<HTMLDivElement>('#root');
+    public static GetApp(id: string = "app"): HTMLElement {
+        const existing = document.getElementById(id);
+        if (existing) return existing;
 
-        if (!app) {
-            const newApp = document.createElement('div');
-            newApp.id = selector.replace('#', '');
-            document.body.appendChild(newApp);
-            return newApp;
+        if (id === "app") {
+            const root = document.getElementById("root");
+            if (root) return root;
         }
 
+        const app = document.createElement("div");
+        app.id = id;
+        document.body.appendChild(app);
         return app;
     }
 
-    public static GetLoader(selector: string = '#loader'): HTMLDivElement {
-        const loader = document.querySelector<HTMLDivElement>(selector);
+    public static GetLoader(id: string = "loader", parent?: HTMLElement): HTMLElement {
+        const existing = document.getElementById(id);
+        if (existing) return existing;
 
-        if (!loader) {
-            const app = DomUtils.GetApp();
-            const newLoader = document.createElement('div');
-            newLoader.id = selector.replace('#', '');
-            app.appendChild(newLoader);
-            return newLoader;
-        }
-
+        const loader = document.createElement("div");
+        loader.id = id;
+        (parent ?? DomUtils.GetApp()).appendChild(loader);
         return loader;
     }
 }

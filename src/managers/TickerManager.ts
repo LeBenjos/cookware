@@ -7,20 +7,26 @@ export type Tickable = {
     options?: TickableOptions;
 };
 
-class TickerManager {
+export class TickerManager {
     private static readonly _TIME_SCALE: number = 0.001;
     private static readonly _MAX_DELTA: number = 0.1;
+    private static readonly _DEFAULT_DELTA: number = 0.016;
 
-    declare private _rafId?: number;
+    private _rafId?: number;
     private _isRunning: boolean = false;
     private readonly _tickables: Map<(dt: number) => void, Tickable> = new Map();
-    private _startTime: number = performance.now();
-    private _currentTime: number = this._startTime;
+    private _startTime: number = 0;
+    private _currentTime: number = 0;
     private _elapsedTime: number = 0;
-    private _deltaTime: number = 0.016;
+    private _deltaTime: number = TickerManager._DEFAULT_DELTA;
 
     public init(): void {
         this.start();
+    }
+
+    public dispose(): void {
+        this.stop();
+        this._tickables.clear();
     }
 
     public start(): void {
@@ -28,6 +34,8 @@ class TickerManager {
         this._isRunning = true;
         this._startTime = performance.now();
         this._currentTime = this._startTime;
+        this._elapsedTime = 0;
+        this._deltaTime = TickerManager._DEFAULT_DELTA;
         this._rafId = requestAnimationFrame(this._update);
     }
 
@@ -40,9 +48,9 @@ class TickerManager {
     }
 
     public play(): void {
-        this.pause();
         this._isRunning = true;
         this._currentTime = performance.now();
+        if (this._rafId === undefined) this._rafId = requestAnimationFrame(this._update);
     }
 
     public pause(): void {
@@ -50,6 +58,10 @@ class TickerManager {
     }
 
     public add(callback: (dt: number) => void, options?: TickableOptions): void {
+        if (this._tickables.has(callback)) {
+            console.warn("TickerManager.add: callback is already registered, keeping its existing options.");
+            return;
+        }
         this._tickables.set(callback, { callback: callback, options: options });
     }
 
@@ -58,22 +70,26 @@ class TickerManager {
     }
 
     private readonly _update = (): void => {
+        this._rafId = requestAnimationFrame(this._update);
+
         const now = performance.now();
-        let delta = Math.min((now - this._currentTime) * TickerManager._TIME_SCALE, TickerManager._MAX_DELTA);
+        const delta = Math.min((now - this._currentTime) * TickerManager._TIME_SCALE, TickerManager._MAX_DELTA);
         this._currentTime = now;
 
         if (this._isRunning) {
             this._deltaTime = delta;
-            this._elapsedTime += this._deltaTime;
+            this._elapsedTime += delta;
         }
 
         for (const tickable of this._tickables.values()) {
             if (this._isRunning || tickable.options?.alwaysActive) {
-                tickable.callback(delta);
+                try {
+                    tickable.callback(delta);
+                } catch (error) {
+                    console.error("TickerManager tickable failed:", error);
+                }
             }
         }
-
-        this._rafId = requestAnimationFrame(this._update);
     };
 
     //#region Getters
@@ -93,5 +109,3 @@ class TickerManager {
     //
     //#endregion
 }
-
-export default new TickerManager();
