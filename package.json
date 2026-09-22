@@ -23,7 +23,9 @@
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run typecheck && npm run build",
-    "release": "npm version",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major",
     "preversion": "npm run typecheck",
     "postversion": "git push --follow-tags && npm publish"
   },
