@@ -1,6 +1,6 @@
 {
   "name": "@benjos/cookware",
-  "version": "2.0.1",
+  "version": "2.0.0",
   "description": "Collection of TypeScript managers, tools and utilities for personal projects",
   "type": "module",
   "main": "./dist/index.js",
@@ -26,7 +26,7 @@
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
     "release:major": "npm version major",
-    "preversion": "npm run typecheck",
+    "preversion": "npm run typecheck && (npm whoami || npm login)",
     "postversion": "git push --follow-tags && npm publish"
   },
   "repository": {
