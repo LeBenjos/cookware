@@ -5,6 +5,7 @@ export class DomResizeManager {
 
     private _width: number = 0;
     private _height: number = 0;
+    private _aspectRatio: number = 0;
     private _pixelRatio: number = 1;
     private _pixelRatioQuery?: MediaQueryList;
     private _rootObserver?: ResizeObserver;
@@ -66,6 +67,7 @@ export class DomResizeManager {
         if (!force && width === this._width && height === this._height && pixelRatio === this._pixelRatio) return;
         this._width = width;
         this._height = height;
+        this._aspectRatio = width / height;
         this._pixelRatio = pixelRatio;
         this.onResize.execute();
     }
@@ -77,6 +79,9 @@ export class DomResizeManager {
     }
     public get height(): number {
         return this._height;
+    }
+    public get aspectRatio(): number {
+        return this._aspectRatio;
     }
     public get pixelRatio(): number {
         return this._pixelRatio;
