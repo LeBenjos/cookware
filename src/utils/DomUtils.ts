@@ -23,4 +23,10 @@ export default class DomUtils {
         (parent ?? DomUtils.GetApp()).appendChild(loader);
         return loader;
     }
+
+    public static GetElement<T extends Element>(parent: ParentNode, selector: string, type: new () => T): T {
+        const element = parent.querySelector(selector);
+        if (!(element instanceof type)) throw new Error(`[DomUtils]: '${selector}' is not a ${type.name}`);
+        return element;
+    }
 }
