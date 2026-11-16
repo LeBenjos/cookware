@@ -1,3 +1,5 @@
+import Action from "../tools/Action.js";
+
 export type TickableOptions = {
     alwaysActive?: boolean;
 };
@@ -20,6 +22,9 @@ export class TickerManager {
     private _elapsedTime: number = 0;
     private _deltaTime: number = TickerManager._DEFAULT_DELTA;
 
+    public readonly onBeforeTick = new Action();
+    public readonly onAfterTick = new Action();
+
     public init(): void {
         this.start();
     }
@@ -27,6 +32,8 @@ export class TickerManager {
     public dispose(): void {
         this.stop();
         this._tickables.clear();
+        this.onBeforeTick.removeAll();
+        this.onAfterTick.removeAll();
     }
 
     public start(): void {
@@ -71,6 +78,7 @@ export class TickerManager {
 
     private readonly _update = (): void => {
         this._rafId = requestAnimationFrame(this._update);
+        this.onBeforeTick.execute();
 
         const now = performance.now();
         const delta = Math.min((now - this._currentTime) * TickerManager._TIME_SCALE, TickerManager._MAX_DELTA);
@@ -90,6 +98,8 @@ export class TickerManager {
                 }
             }
         }
+
+        this.onAfterTick.execute();
     };
 
     //#region Getters
@@ -105,6 +115,9 @@ export class TickerManager {
     }
     public get deltaTime(): number {
         return this._deltaTime;
+    }
+    public get isRunning(): boolean {
+        return this._isRunning;
     }
     //
     //#endregion

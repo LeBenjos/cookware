@@ -153,6 +153,8 @@ Two distinct pairs:
 - `ticker.add(callback, { alwaysActive: true })` — the callback keeps running while the loop is paused. Re-adding an already-registered callback keeps its existing options (a warning is logged).
 - `ticker.remove(callback)` — Unregister a callback.
 - A callback that throws is logged and skipped; it can't kill the loop or starve the other tickables.
+- `ticker.onBeforeTick` / `ticker.onAfterTick` — `Action`s fired at the very start and the very end of each frame, around every tickable. They fire while paused too (not while stopped), e.g. to measure the JS time of a whole frame.
+- `ticker.isRunning` — `false` while paused or stopped.
 - Getters: `startTime`, `currentTime`, `elapsedTime`, `deltaTime`. `elapsedTime` accumulates **clamped** game time, so it drifts from the wall clock after long frame gaps (background tab) — use `currentTime - startTime` for wall-clock elapsed.
 
 ## Tools (Classes to instantiate)
