@@ -107,7 +107,7 @@ resize.onResize.add(() => {
 #### Extra
 
 - `resize.width`, `height` — Viewport size in pixels.
-- `resize.pixelRatio` — `devicePixelRatio`, **clamped to 2** to cap fill-rate cost on high-density displays.
+- `resize.pixelRatio` — `devicePixelRatio`, not clamped: cap it where you render (e.g. `Math.min(resize.pixelRatio, 2)` for a WebGL canvas) to bound fill-rate cost on high-density displays.
 
 ### PoolManager
 

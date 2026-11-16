@@ -1,8 +1,6 @@
 import Action from "../tools/Action.js";
 
 export class DomResizeManager {
-    private static readonly _MAX_PIXEL_RATIO: number = 2;
-
     private _width: number = 0;
     private _height: number = 0;
     private _aspectRatio: number = 0;
@@ -63,7 +61,7 @@ export class DomResizeManager {
     private _resize(force: boolean = false): void {
         const width = window.innerWidth;
         const height = window.innerHeight;
-        const pixelRatio = Math.min(window.devicePixelRatio, DomResizeManager._MAX_PIXEL_RATIO);
+        const pixelRatio = window.devicePixelRatio;
         if (!force && width === this._width && height === this._height && pixelRatio === this._pixelRatio) return;
         this._width = width;
         this._height = height;
